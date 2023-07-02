@@ -1,26 +1,54 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { RedisService } from 'src/connection/redis/redis.service';
+import generateUuid4 from 'src/utils/uuid/generateUuid4';
 
 @Injectable()
 export class CustomersService {
-  create(createCustomerDto: CreateCustomerDto) {
-    return 'This action adds a new customer';
+  private readonly ALIAS = 'customer:';
+  constructor(private readonly redisService: RedisService) {}
+
+  async create(createCustomerDto: CreateCustomerDto) {
+    try {
+      const id = `${this.ALIAS}${generateUuid4()}`;
+      await this.redisService.set(id, JSON.stringify(createCustomerDto));
+      return await this.redisService.get(id);
+    } catch (err) {
+      throw err;
+    }
   }
 
-  findAll() {
-    return `This action returns all customers`;
+  async findAll() {
+    try {
+      return await this.redisService.keys(`${this.ALIAS}*`);
+    } catch (err) {
+      throw err;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  async findOne(id: string) {
+    try {
+      const customer = await this.redisService.get(id);
+
+      if (!customer) throw new NotFoundException('Cliente inexistente');
+
+      return customer;
+    } catch (err) {
+      throw err;
+    }
   }
 
-  update(id: number, updateCustomerDto: UpdateCustomerDto) {
-    return `This action updates a #${id} customer`;
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    const customer = await this.redisService.get(id);
+
+    if (!customer) throw new NotFoundException('Cliente inexistente');
+
+    await this.redisService.set(id, JSON.stringify(updateCustomerDto));
+    return await this.redisService.get(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  remove(id: string) {
+    return this.redisService.del(id);
   }
 }
