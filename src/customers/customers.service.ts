@@ -40,15 +40,22 @@ export class CustomersService {
   }
 
   async update(id: string, updateCustomerDto: UpdateCustomerDto) {
-    const customer = await this.redisService.get(id);
+    try {
+      await this.findOne(id);
 
-    if (!customer) throw new NotFoundException('Cliente inexistente');
-
-    await this.redisService.set(id, JSON.stringify(updateCustomerDto));
-    return await this.redisService.get(id);
+      await this.redisService.set(id, JSON.stringify(updateCustomerDto));
+      return await this.redisService.get(id);
+    } catch (err) {
+      throw err;
+    }
   }
 
-  remove(id: string) {
-    return this.redisService.del(id);
+  async remove(id: string) {
+    try {
+      await this.findOne(id);
+      return await this.redisService.del(id);
+    } catch (err) {
+      throw err;
+    }
   }
 }
