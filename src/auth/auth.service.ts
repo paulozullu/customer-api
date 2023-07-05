@@ -26,7 +26,6 @@ export class AuthService {
       client_id: process.env.AUTH_CLIENT_ID,
       client_secret: process.env.AUTH_CLIENT_SECRET,
       scope: process.env.AUTH_SCOPE,
-      ...data,
     };
 
     return this.httpService
