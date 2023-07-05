@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CustomersController } from './customers.controller';
-import { RedisModule } from 'src/connection/redis/redis.module';
+import { RedisModule } from '../connection/redis/redis.module';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({

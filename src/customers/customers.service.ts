@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { RedisService } from 'src/connection/redis/redis.service';
-import generateUuid4 from 'src/utils/uuid/generateUuid4';
+import { RedisService } from '../connection/redis/redis.service';
+import generateUuid4 from '../utils/uuid/generateUuid4';
 
 @Injectable()
 export class CustomersService {
