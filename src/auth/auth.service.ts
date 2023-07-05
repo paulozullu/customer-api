@@ -1,5 +1,10 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AxiosRequestConfig } from 'axios';
 import * as qs from 'qs';
 import { catchError, map } from 'rxjs';
@@ -13,6 +18,8 @@ export class AuthService {
     const config: AxiosRequestConfig = {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     };
+
+    this.verifyPassword(data);
 
     const requestBody = {
       grant_type: process.env.AUTH_GRANT_TYPE,
@@ -37,5 +44,10 @@ export class AuthService {
           throw new HttpException(err.response.data, err.response.status);
         }),
       );
+  }
+
+  private verifyPassword(data: SignInRequestDto) {
+    if (Buffer.from(data.username).toString('base64') !== data.password)
+      throw new UnauthorizedException();
   }
 }
